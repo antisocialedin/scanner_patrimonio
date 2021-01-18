@@ -1,4 +1,4 @@
-package com.scanner_patrimonio.view;
+package com.scanner_patrimonio.view.patrimonio;
 
 import java.awt.EventQueue;
 
@@ -11,6 +11,7 @@ import com.scanner_patrimonio.model.service.PatrimonioService;
 import com.scanner_patrimonio.struct.util.VariaveisProjeto;
 
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Alignment;
 import javax.swing.JTextField;
@@ -34,12 +35,14 @@ public class PatrimonioGUI extends JFrame {
 	private JPanel contentPane;
 	private JTextField textFieldNome;
 	private JTextField textFieldCodigo;
+	private JTextField textFieldCodigoId;
+	private JTextField textFieldEstado;
+	
 	private JButton btnIncluir;
 	private JButton btnAlterar;
 	private JButton btnExcluir;
 	private JButton btnSair;
-	private JTextField textFieldCodigoId;
-	private JTextField textFieldEstado;
+
 	private JLabel checkName;
 	private JLabel checkCodigo;
 	private JLabel checkEstado;
@@ -318,17 +321,6 @@ public class PatrimonioGUI extends JFrame {
 		
 	}
 	
-//---------------------------------------------------------------------------	
-	protected void incluirPatrimonio() {
-		Patrimonio patrimonio = pegarDadosPatrimonio();
-		//-> Teste
-		//System.out.println(servidor.toString());  
-		
-		PatrimonioService patrimonioService = new PatrimonioService();
-		
-		patrimonioService.save(patrimonio);
-	}
-
 //---------------------------------------------------------------------------
 	protected void alterarPatrimonio() {
 		
@@ -367,7 +359,8 @@ public class PatrimonioGUI extends JFrame {
 	}
 	
 //-----------------------------------------------------------------------------------------------------------
-	 public Patrimonio pegarDadosPatrimonio() {
+	@SuppressWarnings("deprecation")  
+	public Patrimonio pegarDadosPatrimonio() {
 		 Patrimonio servidor = new Patrimonio();
 		 
 		 if (VariaveisProjeto.digitacaoCampo(textFieldCodigoId.getText())){
@@ -500,7 +493,108 @@ public class PatrimonioGUI extends JFrame {
 	  	            checkEstado.setIcon(new ImageIcon(PatrimonioGUI.class.getResource("/com/scanner_patrimonio/struct/imagens/ok.png")));
 	  	        }
 	  	    }
-		
+
+//------------------------------------------------------------------------------------------------------//	
+	    	 protected void incluirPatrimonio() {
+	  			
+	  		Integer toReturn = 0;
+	  		
+	  		Patrimonio patrimonio = pegarDadosPatrimonio();
+	  		
+	  		PatrimonioService patrimonioService = new PatrimonioService();
+	  		
+	  		toReturn = patrimonioService.save(patrimonio);
+	  		
+	  		erroDigitacao(toReturn);
+	  		
+	  		if ( toReturn == VariaveisProjeto.ERRO_INCLUSAO ) {
+	  			showMensagem("Erro na Inclusão do Registro, verifique com seu administrador!",
+	  					   	 "Erro",JOptionPane.ERROR_MESSAGE);
+	  		}
+	  		if ( toReturn == VariaveisProjeto.INCLUSAO_REALIZADA) {
+	  			showMensagem("Inclusão do Registro realizada com sucesso!",
+	  					     "OK",JOptionPane.OK_OPTION);
+	  			limpaTextoCampo();
+	  			tabelaPatrimonioModel.fireTableDataChanged();
+	  			patrimonio = new Patrimonio();
+	  		}
+	    	  }
+	    	  
+//------------------------------------------------------------------------------------------------------/	
+	  	protected void alteraPatrimonio() {
+	  		Integer toReturn = 0;
+	  		
+	  	    Patrimonio patrimonio = pegarDadosPatrimonio();
+	  	    
+	  	    PatrimonioService servidorService = new PatrimonioService();
+	  		
+	  		toReturn = servidorService.update(patrimonio);
+	  		
+	  		erroDigitacao(toReturn);
+	  		
+	  		if ( toReturn == VariaveisProjeto.ERRO_ALTERACAO ) {
+	  			showMensagem("Erro na Alteração do Registro, verifique com seu administrador!",
+	  					   	 "Erro",JOptionPane.ERROR_MESSAGE);
+	  		}
+	  		if ( toReturn == VariaveisProjeto.ALTERACAO_REALIZADA) {
+	  			showMensagem("Alteração do Registro realizada com sucesso!",
+	  					     "OK",JOptionPane.OK_OPTION);
+	  			
+	  			tabelaPatrimonioModel.fireTableDataChanged();
+	  			
+	  			limpaTextoCampo();
+	  			patrimonio = new Patrimonio();
+	  		}
+	  	}
+
+	    	//------------------------------------------------------------------------------------------------------/
+	  	private void erroDigitacao(Integer toReturn) {
+	  		if ( toReturn == VariaveisProjeto.PATRIMONIO_NAME ) {
+	  			 status = false;
+	  			 mudaStatusCheckNome();
+	  			 showMensagem("Erro na digitação do Nome, verifique!","Erro", JOptionPane.ERROR_MESSAGE);
+	  		}
+	  		if ( toReturn == VariaveisProjeto.PATRIMONIO_CODIGO ) {
+	  			 status = false;
+	  			 mudaStatusCheckCodigo();
+	  			 showMensagem("Erro na digitação do Codigo, verifique!","Erro", JOptionPane.ERROR_MESSAGE);
+	  		}
+	  		if ( toReturn == VariaveisProjeto.PATRIMONIO_ESTADO ) {
+	  			 status = false;
+	  			 mudaStatusCheckEstado();
+	  			 showMensagem("Erro na digitação do Estado, verifique!","Erro", JOptionPane.ERROR_MESSAGE);
+	  		}
+	  	}
+	  	
+	    	//------------------------------------------------------------------------------------------------------/	
+	  	protected void excluirUsuario() {
+	  		
+	  		Integer toReturn = 0;
+	  		
+	  		Patrimonio patrimonio = pegarDadosPatrimonio();
+	  		
+	  		PatrimonioService patrimonioService = new PatrimonioService();
+	  		
+	  		toReturn = patrimonioService.delete(patrimonio);
+	  		
+	  		if ( toReturn == VariaveisProjeto.ERRO_EXCLUSAO ) {
+	  			showMensagem("Erro na Exclusão do Registro, verifique com seu administrador!",
+	  					   	 "Erro",JOptionPane.ERROR_MESSAGE);
+	  		}
+	  		if ( toReturn == VariaveisProjeto.EXCLUSAO_REALIZADA) {
+	  			showMensagem("Exclusão do Registro realizada com sucesso!",
+	  					     "OK",JOptionPane.OK_OPTION);
+	  			limpaTextoCampo();
+	  			tabelaPatrimonioModel.fireTableDataChanged();
+	  			patrimonio = new Patrimonio();
+	  		}
+	  		
+	  	}
+	  	
+	  	//------------------------------------------------------------------------------------------------------//
+	  	private void showMensagem(String mensagem, String status, int option ) {
+	  		JOptionPane.showMessageDialog(null, mensagem, status, option );
+	  	}	  	    
 		
 		
 		

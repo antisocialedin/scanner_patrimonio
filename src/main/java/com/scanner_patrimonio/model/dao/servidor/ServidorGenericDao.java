@@ -7,7 +7,7 @@ import java.util.List;
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
 
-public abstract class ServidorGenericDao <Servidor, Id extends Serializable>{
+public abstract class ServidorGenericDao <Servidor, ID extends Serializable>{
 	
 	private EntityManager entityManager;	
 	
@@ -31,13 +31,13 @@ public abstract class ServidorGenericDao <Servidor, Id extends Serializable>{
 		this.getEntityManager().remove(entity);
 	}
 	
-	public Servidor findById(Id idServidor) {
+	public Servidor findById(ID idServidor) {
 		return this.getEntityManager().find(getClassePersistencia(), idServidor);
 	}
 	
 	@SuppressWarnings("unchecked")
 	 public List<Servidor> findAll(Class<Servidor> classe){
-		 List<Servidor> lista = new ArrayList<>();
+		 List<Servidor> lista = new ArrayList<Servidor>();
 		 Query query = this.getEntityManager().createQuery("SELECT o FROM "+classe.getSimpleName()+" o");
 		 
 		 lista = query.getResultList();
@@ -45,16 +45,22 @@ public abstract class ServidorGenericDao <Servidor, Id extends Serializable>{
 		 return lista;		 
 	 }
 	
-	public EntityManager getEntityManager() {
-		return entityManager;
+    
+	public Integer countTotalRegister(Class<Servidor> classe) {
+		Query query = this.getEntityManager().createQuery("SELECT count(o) FROM "+classe.getSimpleName()+" o");
+		Long total = (Long) query.getSingleResult();
+		return total.intValue();
 	}
 	
-	public void setEntityManager(EntityManager entityManager) {
-		this.entityManager = entityManager;
+	public EntityManager getEntityManager() {
+		return entityManager;
 	}
 	
 	public Class<Servidor> getClassePersistencia() {
 		return classePersistencia;
 	}
+	
+	
+	
 
 }

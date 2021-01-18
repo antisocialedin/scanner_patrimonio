@@ -103,19 +103,43 @@ public class ServidorService extends ConexaoBancoService{
 	public Servidor findById(Integer idServidor) {
 		return this.getServidorDao().findById(idServidor);
 	}
-	
+	//-------------------------------------------------------------------
 	public List<Servidor> findAll(){
 		return this.getServidorDao().findAll(Servidor.class);
 	}
 	
+	//-------------------------------------------------------------------
 	public Integer validarDigitacao(Servidor servidor) {
-		if(VariaveisProjeto.digitacaoCampo(servidor.getName())) {
-			return VariaveisProjeto.CAMPO_VAZIO;
-		}		
-		return VariaveisProjeto.DIGITACAO_OK;
-	}	
 
+		if ( VariaveisProjeto.digitacaoCampo(servidor.getName())) {
+			return VariaveisProjeto.SERVIDOR_NAME;
+		}
+		if ( VariaveisProjeto.digitacaoCampo(servidor.getProntuario())) {
+			return VariaveisProjeto.SERVIDOR_PRONTUARIO;
+		}
+		if ( VariaveisProjeto.digitacaoCampo(servidor.getPassword())) {
+			return VariaveisProjeto.SERVIDOR_PASSWORD;
+		}
+		return VariaveisProjeto.DIGITACAO_OK;
+	}
+	
+	//-------------------------------------------------------------------
 	public ServidorDao getServidorDao() {
 		return servidorDao;
 	}
+	//-------------------------------------------------------------------
+	public Integer countTotalRegister() {
+		return servidorDao.countTotalRegister(Servidor.class);
+	}
+	//-------------------------------------------------------------------
+	public List<Servidor> listServidorPaginacao(Integer numeroPagina, Integer defaultPagina) {
+		
+		return servidorDao.listServidorPaginacao(numeroPagina,defaultPagina);
+	}
+	//-------------------------------------------------------------------
+	
+	
+	
+	
+	
 }

@@ -51,71 +51,90 @@ public class PatrimonioService extends ConexaoBancoService{
 		
 		EntityTransaction trx = this.getTransaction();
 		
-		if(validarDigitacao(patrimonio)== VariaveisProjeto.DIGITACAO_OK) {
+		toReturn = validarDigitacao(patrimonio);
 		
+		if  ( toReturn == VariaveisProjeto.DIGITACAO_OK) {
+
 			try {
+
 				trx.begin();
 				this.getPatrimonioDao().update(patrimonio);
 				trx.commit();
-				
-			}catch(Exception ex) {
+				toReturn = VariaveisProjeto.ALTERACAO_REALIZADA;
+
+			} catch (Exception ex) {
 				ex.printStackTrace();
-				if(trx.isActive()) {
+				if ( trx.isActive() ) {
 					trx.rollback();
 				}
 				toReturn = VariaveisProjeto.ERRO_ALTERACAO;
-			}finally {
+
+			} finally {
 				this.close();
 			}
-		} else {
-			toReturn = VariaveisProjeto.CAMPO_VAZIO;
-		}
-		
-		return toReturn;
+		} 
+		return toReturn; 
 	}
 	//-------------------------------------------------------------------
 	public Integer delete(Patrimonio patrimonio) {
-		
-		Integer toReturn =0;
-		
+		Integer toReturn = 0;
 		EntityTransaction trx = this.getTransaction();
-		
-		
-			try {
-				trx.begin();
-				Patrimonio patrimonioEncontrado = this.getPatrimonioDao().findById(patrimonio.getId());
-				this.getPatrimonioDao().remove(patrimonioEncontrado);
-				trx.commit();
-				
-			}catch(Exception ex) {
-				ex.printStackTrace();
-				if(trx.isActive()) {
-					trx.rollback();
-				}
-				toReturn = VariaveisProjeto.ERRO_ALTERACAO;
-			}finally {
-				this.close();
+		try {
+
+			trx.begin();
+			Patrimonio patrimonioEncontrado = this.getPatrimonioDao().findById(patrimonio.getId());
+			this.getPatrimonioDao().remove(patrimonioEncontrado);
+			trx.commit();
+			toReturn = VariaveisProjeto.EXCLUSAO_REALIZADA;
+
+		} catch (Exception ex) {
+			ex.printStackTrace();
+			if ( trx.isActive() ) {
+				trx.rollback();
 			}
-		
-		return toReturn;
+			toReturn = VariaveisProjeto.ERRO_EXCLUSAO;
+
+		} finally {
+			this.close();
+		}
+
+		return toReturn; 
 	}
 	//-------------------------------------------------------------------
 	public Patrimonio findById(Integer idPatrimonio) {
 		return this.getPatrimonioDao().findById(idPatrimonio);
 	}
-	
+	//-------------------------------------------------------------------
 	public List<Patrimonio> findAll(){
 		return this.getPatrimonioDao().findAll(Patrimonio.class);
 	}
-	
+	//-------------------------------------------------------------------
 	public Integer validarDigitacao(Patrimonio patrimonio) {
-		if(VariaveisProjeto.digitacaoCampo(patrimonio.getName())) {
-			return VariaveisProjeto.CAMPO_VAZIO;
-		}		
-		return VariaveisProjeto.DIGITACAO_OK;
-	}	
 
+		if ( VariaveisProjeto.digitacaoCampo(patrimonio.getName())) {
+			return VariaveisProjeto.PATRIMONIO_NAME;
+		}
+		if ( VariaveisProjeto.digitacaoCampo(patrimonio.getCodigo())) {
+			return VariaveisProjeto.PATRIMONIO_CODIGO;
+		}
+		if ( VariaveisProjeto.digitacaoCampo(patrimonio.getEstado())) {
+			return VariaveisProjeto.PATRIMONIO_ESTADO;
+		}
+		return VariaveisProjeto.DIGITACAO_OK;
+	}
+	//-------------------------------------------------------------------
 	public PatrimonioDao getPatrimonioDao() {
 		return patrimonioDao;
 	}
+	//-------------------------------------------------------------------
+	public Integer countTotalRegister() {
+		return patrimonioDao.countTotalRegister(Patrimonio.class);
+	}
+	//-------------------------------------------------------------------
+	public List<Patrimonio> listPatrimonioPaginacao(Integer numeroPagina, Integer defaultPagina) {
+		
+		return patrimonioDao.listPatrimonioPaginacao(numeroPagina,defaultPagina);
+	}
+	
+	
 }

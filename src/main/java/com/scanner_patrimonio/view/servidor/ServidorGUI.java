@@ -1,4 +1,4 @@
-package com.scanner_patrimonio.view;
+package com.scanner_patrimonio.view.servidor;
 
 import java.awt.EventQueue;
 
@@ -9,8 +9,10 @@ import javax.swing.border.EmptyBorder;
 import com.scanner_patrimonio.model.models.Servidor;
 import com.scanner_patrimonio.model.service.ServidorService;
 import com.scanner_patrimonio.struct.util.VariaveisProjeto;
+import com.scanner_patrimonio.view.patrimonio.PatrimonioGUI;
 
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.GroupLayout;
 import javax.swing.ImageIcon;
 import javax.swing.GroupLayout.Alignment;
@@ -19,6 +21,7 @@ import javax.swing.SwingConstants;
 import javax.swing.LayoutStyle.ComponentPlacement;
 import javax.swing.JPasswordField;
 import javax.swing.JRadioButton;
+import javax.swing.JTable;
 import javax.swing.JButton;
 import java.awt.event.ActionListener;
 import java.awt.event.FocusAdapter;
@@ -52,7 +55,6 @@ public class ServidorGUI extends JFrame {
 	private JLabel checkSenha;
 	
 	private boolean status = true;
-	
 	
 	/**
 	 * Launch the application.
@@ -327,6 +329,7 @@ public class ServidorGUI extends JFrame {
 		desabilitaCheckCampo();
 	}
 	
+	
 	//------------------------------------------------------------------------------------------------------------------
 	protected void excluirServidor() {
 		
@@ -339,16 +342,7 @@ public class ServidorGUI extends JFrame {
 		limpaTextoCampo();
 		
 	}
-	//------------------------------------------------------------------------------------------------------------------
-	protected void incluirServidor() {
-		Servidor servidor = pegarDadosServidor();
-		//-> Teste
-		//System.out.println(servidor.toString());  
-		
-		ServidorService servidorService = new ServidorService();
-		
-		servidorService.save(servidor);
-	}
+
 	//------------------------------------------------------------------------------------------------------------------
 	protected void alterarServidor() {
 		
@@ -389,7 +383,8 @@ public class ServidorGUI extends JFrame {
 			rdbtnVoluntario.setSelected(true);
 	}
 	//------------------------------------------------------------------------------------------------------------------
-	 public Servidor pegarDadosServidor() {
+	@SuppressWarnings("deprecation") 
+	public Servidor pegarDadosServidor() {
 		 Servidor servidor = new Servidor();
 		 
 		 if (VariaveisProjeto.digitacaoCampo(textFieldCodigo.getText())){
@@ -465,7 +460,7 @@ public class ServidorGUI extends JFrame {
 	        }
 	    }	
   //-------------------------------------------------------------------------------------------------------//
-	//-------------------------------------Codigo--------------------------------------------------//
+	//-------------------------------------Prontuario--------------------------------------------------//
 
   	    private void digitacaoProntuarioValido() {
   	        status = true;
@@ -490,49 +485,149 @@ public class ServidorGUI extends JFrame {
 
   	    private void mudaStatusCheckProntuario() {
 
-  	        checkProntuario.setVisible(true);
+        checkProntuario.setVisible(true);
 
-  	        if(status == false) {
-  	            checkProntuario.setIcon(new ImageIcon(PatrimonioGUI.class.getResource("/com/scanner_patrimonio/struct/imagens/iconFechar.png")));
-  	        } else {
-  	            checkProntuario.setIcon(new ImageIcon(PatrimonioGUI.class.getResource("/com/scanner_patrimonio/struct/imagens/ok.png")));
-  	        }
+        if(status == false) {
+            checkProntuario.setIcon(new ImageIcon(PatrimonioGUI.class.getResource("/com/scanner_patrimonio/struct/imagens/iconFechar.png")));
+        } else {
+            checkProntuario.setIcon(new ImageIcon(PatrimonioGUI.class.getResource("/com/scanner_patrimonio/struct/imagens/ok.png")));
+        }
   	    }		    
   	 	//-------------------------------------------------------------------------------------------------------//
-  		//-------------------------------------Estado--------------------------------------------------//
+  		//-------------------------------------Senha--------------------------------------------------//
 
-		  	    private void digitacaoSenhaValida() {
-		  	        status = true;
-		  	        mudaStatusCheckSenha();
-		  	        checkSenha.setVisible(true);
-		  	    }
+  	    private void digitacaoSenhaValida() {
+  	        status = true;
+  	        mudaStatusCheckSenha();
+  	        checkSenha.setVisible(true);
+  	    }
 
   //-------------------------------------------------------------------------------------------------------//
+  	    @SuppressWarnings("deprecation")
+  	    private boolean verificaDigitacaoSenha() {
 
-		  	    private boolean verificaDigitacaoSenha() {
-
-		  	        if(VariaveisProjeto.digitacaoCampo(passwordFieldSenha.getSelectedText())) {
-		  	            status = false;
-		  	            mudaStatusCheckSenha();
-		  	            return true;
-		  	        }
-		  	        return false;
-		  	    }
+  	        if(VariaveisProjeto.digitacaoCampo(passwordFieldSenha.getSelectedText())) {
+  	            status = false;
+  	            mudaStatusCheckSenha();
+  	            return true;
+  	        }
+  	        return false;
+  	    }
 		  	    
   //------------------------------------------------------------------------------------------------------//
 
-	  	    private void mudaStatusCheckSenha() {
+  	    private void mudaStatusCheckSenha() {
 
-	  	        checkSenha.setVisible(true);
+        checkSenha.setVisible(true);
 
-	  	        if(status == false) {
-	  	            checkSenha.setIcon(new ImageIcon(PatrimonioGUI.class.getResource("/com/scanner_patrimonio/struct/imagens/iconFechar.png")));
-	  	        } else {
-	  	            checkSenha.setIcon(new ImageIcon(PatrimonioGUI.class.getResource("/com/scanner_patrimonio/struct/imagens/ok.png")));
-	  	        }
-	  	    }		
+        if(status == false) {
+            checkSenha.setIcon(new ImageIcon(PatrimonioGUI.class.getResource("/com/scanner_patrimonio/struct/imagens/iconFechar.png")));
+        } else {
+            checkSenha.setIcon(new ImageIcon(PatrimonioGUI.class.getResource("/com/scanner_patrimonio/struct/imagens/ok.png")));
+        }
+    }
+  	   
+  	//------------------------------------------------------------------------------------------------------//	
+  	  protected void incluirServidor() {
+			
+		Integer toReturn = 0;
 		
+		Servidor servidor = pegarDadosServidor();
 		
+		ServidorService servidorService = new ServidorService();
+		
+		toReturn = servidorService.save(servidor);
+		
+		erroDigitacao(toReturn);
+		
+		if ( toReturn == VariaveisProjeto.ERRO_INCLUSAO ) {
+			showMensagem("Erro na Inclusão do Registro, verifique com seu administrador!",
+					   	 "Erro",JOptionPane.ERROR_MESSAGE);
+		}
+		if ( toReturn == VariaveisProjeto.INCLUSAO_REALIZADA) {
+			showMensagem("Inclusão do Registro realizada com sucesso!",
+					     "OK",JOptionPane.OK_OPTION);
+			limpaTextoCampo();
+			tabelaServidorModel.fireTableDataChanged();
+			servidor = new Servidor();
+		}
+  	  }
+  	  
+    	//------------------------------------------------------------------------------------------------------/	
+	protected void alterarUsuario() {
+		Integer toReturn = 0;
+		
+	    Servidor servidor = pegarDadosServidor();
+	    
+	    ServidorService servidorService = new ServidorService();
+		
+		toReturn = servidorService.update(servidor);
+		
+		erroDigitacao(toReturn);
+		
+		if ( toReturn == VariaveisProjeto.ERRO_ALTERACAO ) {
+			showMensagem("Erro na Alteração do Registro, verifique com seu administrador!",
+					   	 "Erro",JOptionPane.ERROR_MESSAGE);
+		}
+		if ( toReturn == VariaveisProjeto.ALTERACAO_REALIZADA) {
+			showMensagem("Alteração do Registro realizada com sucesso!",
+					     "OK",JOptionPane.OK_OPTION);
+			
+			tabelaServidorModel.fireTableDataChanged();
+			
+			limpaTextoCampo();
+			servidor = new Servidor();
+		}
+	}
+
+  	//------------------------------------------------------------------------------------------------------/
+	private void erroDigitacao(Integer toReturn) {
+		if ( toReturn == VariaveisProjeto.SERVIDOR_USER_NAME ) {
+			 status = false;
+			 mudaStatusCheckNome();
+			 showMensagem("Erro na digitação do Nome, verifique!","Erro", JOptionPane.ERROR_MESSAGE);
+		}
+		if ( toReturn == VariaveisProjeto.SERVIDOR_PRONTUARIO ) {
+			 status = false;
+			 mudaStatusCheckProntuario();
+			 showMensagem("Erro na digitação do Prontuario, verifique!","Erro", JOptionPane.ERROR_MESSAGE);
+		}
+		if ( toReturn == VariaveisProjeto.SERVIDOR_PASSWORD ) {
+			 status = false;
+			 mudaStatusCheckSenha();
+			 showMensagem("Erro na digitação da Senha, verifique!","Erro", JOptionPane.ERROR_MESSAGE);
+		}
+	}
+	
+  	//------------------------------------------------------------------------------------------------------/	
+	protected void excluirUsuario() {
+		
+		Integer toReturn = 0;
+		
+		Servidor servidor = pegarDadosServidor();
+		
+		ServidorService servidorService = new ServidorService();
+		
+		toReturn = servidorService.delete(servidor);
+		
+		if ( toReturn == VariaveisProjeto.ERRO_EXCLUSAO ) {
+			showMensagem("Erro na Exclusão do Registro, verifique com seu administrador!",
+					   	 "Erro",JOptionPane.ERROR_MESSAGE);
+		}
+		if ( toReturn == VariaveisProjeto.EXCLUSAO_REALIZADA) {
+			showMensagem("Exclusão do Registro realizada com sucesso!",
+					     "OK",JOptionPane.OK_OPTION);
+			limpaTextoCampo();
+			tabelaServidorModel.fireTableDataChanged();
+			servidor = new Servidor();
+		}
+		
+	}
+	
+	//------------------------------------------------------------------------------------------------------//
+	private void showMensagem(String mensagem, String status, int option ) {
+		JOptionPane.showMessageDialog(null, mensagem, status, option );
+	}
 		
 		
 		

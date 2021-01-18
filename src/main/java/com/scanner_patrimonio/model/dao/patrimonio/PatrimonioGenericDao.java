@@ -37,13 +37,21 @@ public abstract class PatrimonioGenericDao <Patrimonio, Id extends Serializable>
 	
 	@SuppressWarnings("unchecked")
 	 public List<Patrimonio> findAll(Class<Patrimonio> classe){
+		
 		 List<Patrimonio> lista = new ArrayList<>();
+		 
 		 Query query = this.getEntityManager().createQuery("SELECT o FROM "+classe.getSimpleName()+" o");
 		 
 		 lista = query.getResultList();
 		 
 		 return lista;		 
 	 }
+	
+	public Integer countTotalRegister(Class<Patrimonio> classe) {
+		Query query = this.getEntityManager().createQuery("SELECT count(o) FROM "+classe.getSimpleName()+" o");
+		Long total = (Long) query.getSingleResult();
+		return total.intValue();
+	}
 	
 	public EntityManager getEntityManager() {
 		return entityManager;

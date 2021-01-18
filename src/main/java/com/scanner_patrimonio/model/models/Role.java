@@ -17,7 +17,7 @@ public class Role {
 	private Long id;
 	private String nome;
 	
-	private List<Usuario> usuarios;
+	private List<Servidor> servidor;
 	
 	
 	public Role() {
@@ -57,13 +57,13 @@ public class Role {
 	// MUITOS PARA MUITOS 
 	
     @ManyToMany(mappedBy = "roles")
-	public List<Usuario> getUsuarios() {
-		return usuarios;
+	public List<Servidor> getServidores() {
+		return servidor;
 	}
 
 
-	public void setUsuarios(List<Usuario> usuarios) {
-		this.usuarios = usuarios;
+	public void setServidores(List<Servidor> usuarios) {
+		this.servidor = usuarios;
 	}
 
 

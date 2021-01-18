@@ -1,14 +1,20 @@
 package com.scanner_patrimonio.model.models;
 
+import java.util.List;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToMany;
 import javax.persistence.Table;
 
 @Entity
-@Table(name="TAB_USUARIO")
+@Table(name="TAB_SERVIDOR")
 public class Servidor {
 	
 
@@ -20,9 +26,11 @@ public class Servidor {
 	private boolean voluntario = false;
 	private boolean admin = false;
 	
+	private List<Role> roles;
+	
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	@Column(name = "USUARIO_ID")
+	@Column(name = "SERVIDOR_ID")
 	public Integer getId() {
 		return id;
 	}
@@ -30,7 +38,7 @@ public class Servidor {
 		this.id = id;
 	}
 	
-	@Column(name = "USUARIO_USERNAME", length = 60, nullable = false)
+	@Column(name = "SERVIDOR_USERNAME", length = 60, nullable = false)
 	public String getName() {
 		return name;
 	}
@@ -38,7 +46,7 @@ public class Servidor {
 		this.name = username;
 	}
 	
-	@Column(name = "USUARIO_PRONTUARIO", length = 100, nullable = false, unique = true)
+	@Column(name = "SERVIDOR_PRONTUARIO", length = 100, nullable = false, unique = true)
 	public String getProntuario() {
 		return prontuario;
 	}
@@ -46,7 +54,7 @@ public class Servidor {
 		this.prontuario = prontuario;
 	}
 	
-	@Column(name = "USUARIO_PASSWORD", length = 100, nullable = false)
+	@Column(name = "SERVIDOR_PASSWORD", length = 100, nullable = false)
 	public String getPassword() {
 		return password;
 	}
@@ -69,6 +77,21 @@ public class Servidor {
 	public void setAdmin(boolean admin) {
 		this.admin = admin;
 	}
+	
+	// MUITOS PARA MUITOS
+	   
+	@ManyToMany(fetch = FetchType.LAZY)
+	@JoinTable(name = "TAB_SERVIDOR_ROLE",
+		joinColumns = @JoinColumn(name="SERVIDOR_ID"),
+		inverseJoinColumns = @JoinColumn(name="ROLE_ID"))
+	public List<Role> getRoles() {
+		return roles;
+	}
+
+	public void setRoles(List<Role> roles) {
+		this.roles = roles;
+	}
+	
 	@Override
 	public int hashCode() {
 		final int prime = 31;

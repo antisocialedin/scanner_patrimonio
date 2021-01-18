@@ -24,13 +24,18 @@ public static final String PERSISTENCE_UNIT_NAME = "projeto";
 	public static final Integer CAMPO_VAZIO = 200;
 	// classe de servidor
 	
-	public static final Integer USUARIO_USER_NAME = 201;
-	public static final Integer USUARIO_PRONTUARIO = 202;
-	public static final Integer USUARIO_PASSWORD = 203;
-			
+	public static final Integer SERVIDOR_NAME = 201;
+	public static final Integer SERVIDOR_PRONTUARIO = 202;
+	public static final Integer SERVIDOR_PASSWORD = 203;
 	
-	// classe de departamento
-	public static final Integer DEPARTAMENTO_NOME = 300;
+	// classe de patrimonio
+	
+	public static final Integer PATRIMONIO_NAME = 201;
+	public static final Integer PATRIMONIO_CODIGO = 202;
+	public static final Integer PATRIMONIO_ESTADO = 203;
+	
+	// classe de area
+	public static final Integer AREA_NOME = 300;
 	
 	
 	public static final String LIMPA_CAMPO = "";

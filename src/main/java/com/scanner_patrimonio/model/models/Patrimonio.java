@@ -2,9 +2,12 @@ package com.scanner_patrimonio.model.models;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
 @Entity
@@ -17,6 +20,7 @@ public class Patrimonio {
 	private String codigo;
 	private String estado;
 	
+	private Area area;
 	
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -52,6 +56,17 @@ public class Patrimonio {
 		this.estado = estado;
 	}
 	
+	// muitos para um 
+	
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "AREA_ID", nullable = false)
+    public Area getArea() {
+		return area;
+	}
+
+	public void setDepartamento(Area area) {
+		this.area = area;
+	}
 	
 	@Override
 	public int hashCode() {
