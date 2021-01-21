@@ -38,8 +38,6 @@ public class PatrimonioService extends ConexaoBancoService{
 			}finally {
 				this.close();
 			}
-		} else {
-			toReturn = VariaveisProjeto.CAMPO_VAZIO;
 		}
 		
 		return toReturn;

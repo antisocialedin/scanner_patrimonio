@@ -58,13 +58,13 @@ public class Patrimonio {
 	
 	// muitos para um 
 	
-	@ManyToOne(fetch = FetchType.LAZY)
+	@ManyToOne(fetch = FetchType.EAGER)
 	@JoinColumn(name = "AREA_ID", nullable = false)
     public Area getArea() {
 		return area;
 	}
 
-	public void setDepartamento(Area area) {
+	public void setArea(Area area) {
 		this.area = area;
 	}
 	

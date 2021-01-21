@@ -1,6 +1,7 @@
 package com.scanner_patrimonio.model.models;
 
 import java.util.List;
+import java.util.Set;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -14,7 +15,7 @@ import javax.persistence.ManyToMany;
 import javax.persistence.Table;
 
 @Entity
-@Table(name="TAB_SERVIDOR")
+@Table(name = "TAB_SERVIDOR")
 public class Servidor {
 	
 
@@ -80,7 +81,7 @@ public class Servidor {
 	
 	// MUITOS PARA MUITOS
 	   
-	@ManyToMany(fetch = FetchType.LAZY)
+	@ManyToMany(fetch = FetchType.EAGER)
 	@JoinTable(name = "TAB_SERVIDOR_ROLE",
 		joinColumns = @JoinColumn(name="SERVIDOR_ID"),
 		inverseJoinColumns = @JoinColumn(name="ROLE_ID"))

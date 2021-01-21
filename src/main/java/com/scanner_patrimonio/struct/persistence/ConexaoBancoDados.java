@@ -59,7 +59,7 @@ public class ConexaoBancoDados {
 		properties.put("useUnicode", "true");
 		properties.put("characterEncoding", "UTF-8");
 		properties.put("hibernate.default_schema", "scanner_patrimonio");
-		
+		//properties.put(",")
 		return Persistence.createEntityManagerFactory(VariaveisProjeto.PERSISTENCE_UNIT_NAME, properties);
 	}
 	

@@ -19,6 +19,7 @@ import javax.swing.JPopupMenu;
 import javax.swing.border.EmptyBorder;
 
 import com.scanner_patrimonio.main.Login;
+import com.scanner_patrimonio.view.patrimonio.TabelaPatrimonio;
 import com.scanner_patrimonio.view.servidor.TabelaServidor;
 
 public class Menu extends JFrame {
@@ -39,6 +40,7 @@ public class Menu extends JFrame {
 	private Login login;
 	private JMenu sair;
 	private JMenuItem sair_sistema;
+	private JMenuItem patrimonio;
 
 	/**
 	 * Launch the application.
@@ -61,7 +63,7 @@ public class Menu extends JFrame {
 	
 	private void initComponents() {
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		setBounds(100, 100, 1115, 559);
+		setBounds(100, 100, 1115, 612);
 		
 		menuBar = new JMenuBar();
 		setJMenuBar(menuBar);
@@ -81,6 +83,18 @@ public class Menu extends JFrame {
 		});
 		arquivo.add(servidor);
 		
+		patrimonio = new JMenuItem("Patrimonio");
+		patrimonio.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				TabelaPatrimonio tabelaPatrimonio = new TabelaPatrimonio();
+				centralizaForm(tabelaPatrimonio);
+				contentPane.add(tabelaPatrimonio);
+				tabelaPatrimonio.setVisible(true);
+				
+			}
+		});
+		arquivo.add(patrimonio);
+		
 		logout = new JMenuItem("logout");
 		logout.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -91,6 +105,7 @@ public class Menu extends JFrame {
 		});
 		arquivo.add(logout);
 		
+
 		sair = new JMenu("Sair");
 		menuBar.add(sair);
 		

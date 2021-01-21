@@ -15,6 +15,7 @@ import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JFrame;
+import javax.swing.JInternalFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
@@ -32,7 +33,7 @@ import com.scanner_patrimonio.model.service.PatrimonioService;
 import com.scanner_patrimonio.view.patrimonio.TabelaPatrimonio;
 
 
-public class TabelaPatrimonio extends JFrame{
+public class TabelaPatrimonio extends JInternalFrame{
 
 	
 	
@@ -79,6 +80,8 @@ public class TabelaPatrimonio extends JFrame{
 	private Integer defaultPagina = 5;
 	private Integer totalPagina = 1;
 	private Integer numeroPagina = 1;
+	private JPanel panel_1;
+	private JButton btnRelatorio;
 	
 	
 
@@ -164,6 +167,8 @@ public class TabelaPatrimonio extends JFrame{
 		lblTotal = new JLabel("total ");
 		
 		lblfinal = new JLabel("50");
+		
+		panel_1 = new JPanel();
 		GroupLayout gl_contentPane = new GroupLayout(contentPane);
 		gl_contentPane.setHorizontalGroup(
 			gl_contentPane.createParallelGroup(Alignment.LEADING)
@@ -177,7 +182,9 @@ public class TabelaPatrimonio extends JFrame{
 							.addGap(18)
 							.addComponent(brnExcluir)
 							.addGap(18)
-							.addComponent(btnSair))
+							.addComponent(btnSair)
+							.addGap(131)
+							.addComponent(panel_1, GroupLayout.PREFERRED_SIZE, 153, GroupLayout.PREFERRED_SIZE))
 						.addGroup(gl_contentPane.createSequentialGroup()
 							.addComponent(lblPesquisar)
 							.addPreferredGap(ComponentPlacement.UNRELATED)
@@ -200,7 +207,7 @@ public class TabelaPatrimonio extends JFrame{
 								.addGap(18)
 								.addComponent(lblfinal))
 							.addComponent(scrollPane, GroupLayout.PREFERRED_SIZE, 820, GroupLayout.PREFERRED_SIZE)))
-					.addContainerGap(78, Short.MAX_VALUE))
+					.addContainerGap(74, Short.MAX_VALUE))
 		);
 		gl_contentPane.setVerticalGroup(
 			gl_contentPane.createParallelGroup(Alignment.LEADING)
@@ -229,13 +236,27 @@ public class TabelaPatrimonio extends JFrame{
 								.addComponent(btnAlterar)
 								.addComponent(brnExcluir)
 								.addComponent(btnSair)))
-						.addGroup(gl_contentPane.createParallelGroup(Alignment.BASELINE)
-							.addComponent(lblfinal)
-							.addComponent(lblTotal)
-							.addComponent(lblInicio)
-							.addComponent(lblPagina)))
+						.addGroup(gl_contentPane.createSequentialGroup()
+							.addGroup(gl_contentPane.createParallelGroup(Alignment.BASELINE)
+								.addComponent(lblfinal)
+								.addComponent(lblTotal)
+								.addComponent(lblInicio)
+								.addComponent(lblPagina))
+							.addPreferredGap(ComponentPlacement.RELATED, 40, Short.MAX_VALUE)
+							.addComponent(panel_1, GroupLayout.PREFERRED_SIZE, 40, GroupLayout.PREFERRED_SIZE)))
 					.addGap(19))
 		);
+		
+		btnRelatorio = new JButton("Relatório");
+		btnRelatorio.setIcon(new ImageIcon(TabelaPatrimonio.class.getResource("/com/scanner_patrimonio/struct/imagens/pdf.png")));
+		btnRelatorio.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				RelPatrimonio relPatrimonio = new RelPatrimonio(new JFrame(), true);
+				relPatrimonio.setLocationRelativeTo(null);
+				relPatrimonio.setVisible(true);
+			}
+		});
+		panel_1.add(btnRelatorio);
 		
 		btnPrimeiro = new JButton("");
 		btnPrimeiro.addActionListener(new ActionListener() {

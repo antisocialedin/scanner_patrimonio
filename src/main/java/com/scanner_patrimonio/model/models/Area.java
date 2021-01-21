@@ -17,7 +17,7 @@ public class Area {
 	private Integer id;
 	private String nome;
 	
-	private List<Area> area;
+	private List<Patrimonio> patrimonio;
 	
 	
 	public Area() {
@@ -55,13 +55,13 @@ public class Area {
 	//um para muitos 
 	
 	@OneToMany(mappedBy = "area")
-	public List<Area> getPatrimonio() {
-		return area;
+	public List<Patrimonio> getPatrimonio() {
+		return patrimonio;
 	}
 
 
-	public void setPatrimonio(List<Area> patrimonio) {
-		this.area = patrimonio;
+	public void setPatrimonio(List<Patrimonio> patrimonio) {
+		this.patrimonio = patrimonio;
 	}
 
 

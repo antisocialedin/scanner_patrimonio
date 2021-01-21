@@ -38,10 +38,7 @@ public class ServidorService extends ConexaoBancoService{
 			}finally {
 				this.close();
 			}
-		} else {
-			toReturn = VariaveisProjeto.CAMPO_VAZIO;
 		}
-		
 		return toReturn;
 	}
 	//-------------------------------------------------------------------
@@ -67,8 +64,6 @@ public class ServidorService extends ConexaoBancoService{
 			}finally {
 				this.close();
 			}
-		} else {
-			toReturn = VariaveisProjeto.CAMPO_VAZIO;
 		}
 		
 		return toReturn;

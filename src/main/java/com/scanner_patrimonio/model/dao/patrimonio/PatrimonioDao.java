@@ -15,15 +15,15 @@ public class PatrimonioDao extends PatrimonioGenericDao <Patrimonio, Integer> {
 	}
 	
 	@SuppressWarnings("unchecked")
+	 
 	public List<Patrimonio> listPatrimonioPaginacao(Integer numeroPagina, Integer defaultPagina) {
 		
 		List<Patrimonio> listaPatrimonio = new ArrayList<Patrimonio>();
 		
-		boolean voluntario = true;
 		
-		
-		Query query = this.getEntityManager().createQuery("SELECT u FROM Usuario u WHERE u.ativo =:ativo")
-											 .setParameter("voluntario", voluntario)
+		Query query = this.getEntityManager().createQuery("SELECT u FROM Patrimonio u "
+											+ "LEFT JOIN FETCH u.area "
+											+ "LEFT JOIN FETCH u.roles ")
 											 .setFirstResult(numeroPagina)
 											 .setMaxResults(defaultPagina);
 		listaPatrimonio = query.getResultList();

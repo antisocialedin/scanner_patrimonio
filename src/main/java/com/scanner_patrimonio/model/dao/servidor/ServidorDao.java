@@ -19,14 +19,13 @@ public class ServidorDao extends ServidorGenericDao <Servidor, Integer> {
 	public List<Servidor> listServidorPaginacao(Integer numeroPagina, Integer defaultPagina) {
 		
 		List<Servidor> listaServidor = new ArrayList<Servidor>();
+	
 		
-		boolean voluntario = true;
-		
-		
-		Query query = this.getEntityManager().createQuery("SELECT u FROM Usuario u WHERE u.ativo =:ativo")
-											 .setParameter("ativo", voluntario)
+		Query query = this.getEntityManager().createQuery("SELECT u FROM Servidor u "
+											+ "LEFT JOIN FETCH u.roles ")
 											 .setFirstResult(numeroPagina)
-											 .setMaxResults(defaultPagina);
+											 .setMaxResults(defaultPagina);	
+
 		listaServidor = query.getResultList();
 		
 		return listaServidor;

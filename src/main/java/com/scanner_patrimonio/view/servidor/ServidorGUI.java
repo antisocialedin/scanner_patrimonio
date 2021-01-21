@@ -1,6 +1,5 @@
 package com.scanner_patrimonio.view.servidor;
 
-import java.awt.EventQueue;
 
 import javax.swing.JFrame;
 import javax.swing.JPanel;
@@ -9,7 +8,7 @@ import javax.swing.border.EmptyBorder;
 import com.scanner_patrimonio.model.models.Servidor;
 import com.scanner_patrimonio.model.service.ServidorService;
 import com.scanner_patrimonio.struct.util.VariaveisProjeto;
-import com.scanner_patrimonio.view.patrimonio.PatrimonioGUI;
+
 
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
@@ -23,6 +22,8 @@ import javax.swing.JPasswordField;
 import javax.swing.JRadioButton;
 import javax.swing.JTable;
 import javax.swing.JButton;
+import javax.swing.JDialog;
+
 import java.awt.event.ActionListener;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
@@ -30,7 +31,7 @@ import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.ActionEvent;
 
-public class ServidorGUI extends JFrame {
+public class ServidorGUI extends JDialog {
 
 	/**
 	 * 
@@ -39,6 +40,7 @@ public class ServidorGUI extends JFrame {
 	private JPanel contentPane;
 	private JTextField textFieldNome;
 	private JTextField textFieldProntuario;
+	private JTextField textFieldProntuario_1;
 	private JTextField textFieldCodigo;
 	private JPasswordField passwordFieldSenha;
 	
@@ -56,9 +58,18 @@ public class ServidorGUI extends JFrame {
 	
 	private boolean status = true;
 	
+    private JTable tabelaServidor;
+    private TabelaServidorModel tabelaServidorModel;
+    private int linha = 0;
+    private int acao  = 0;
+    private JPanel panel;
+    private JButton btnRelatrio;
+    
+    
 	/**
 	 * Launch the application.
 	 */
+    /*
 	public static void main(String[] args) {
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
@@ -71,13 +82,57 @@ public class ServidorGUI extends JFrame {
 			}
 		});
 	}
+	*/
 
 	/**
 	 * Create the frame.
 	 */
-	public ServidorGUI() {
+    
+	public ServidorGUI(JFrame frame, boolean modal, JTable tabelaServidor, TabelaServidorModel tabelaServidorModel, int linha, int acao) {
+		
+		
+		super(frame, modal);
+
+		initComponents();
+		
+		this.tabelaServidor = tabelaServidor;
+		this.tabelaServidorModel = tabelaServidorModel;
+		this.linha = linha;
+        this.acao = acao;
+		
+		limpaTextoCampo();
+		
+		desabilitaCheckCampos();
+		
+		configuraAcaoServidor();
+		
+	}
+	
+	//------------------------------------------------------------------------------------------------------------------
+	private void configuraAcaoServidor() {
+		
+		if (this.acao == VariaveisProjeto.INCLUSAO) {
+			btnIncluir.setVisible(true);
+			btnAlterar.setVisible(false);
+			btnExcluir.setVisible(false);
+		}
+		if (this.acao == VariaveisProjeto.ALTERACAO) {
+			btnAlterar.setVisible(true);
+			btnExcluir.setVisible(false);
+			btnIncluir.setVisible(false);
+			buscarServidor();
+		}
+		if (this.acao == VariaveisProjeto.EXCLUSAO) {
+			btnExcluir.setVisible(true);
+			btnIncluir.setVisible(false);
+			btnAlterar.setVisible(false);
+			buscarServidor();
+		}
+	}
+	//-----------------------------------------------------------------------------------------------------------------
+	private void initComponents() {
 		setTitle("Cadastro de Servidor");
-		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		//setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(100, 100, 615, 317);
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
@@ -115,8 +170,8 @@ public class ServidorGUI extends JFrame {
 		JLabel lblProntuario = new JLabel("Prontuário:");
 		
 		textFieldProntuario = new JTextField();
-		textFieldProntuario = new JTextField();
-		textFieldProntuario.addFocusListener(new FocusAdapter() {
+		textFieldProntuario_1 = new JTextField();
+		textFieldProntuario_1.addFocusListener(new FocusAdapter() {
 			@Override
             public void focusLost(FocusEvent e) {
                 if( verificaDigitacaoProntuario() ) {
@@ -127,7 +182,7 @@ public class ServidorGUI extends JFrame {
             }
         });
 
-        textFieldProntuario.addKeyListener(new KeyAdapter() {
+        textFieldProntuario_1.addKeyListener(new KeyAdapter() {
             @Override
             public void keyPressed(KeyEvent e) {
                 if(e.getKeyCode() == KeyEvent.VK_ENTER) {
@@ -139,8 +194,8 @@ public class ServidorGUI extends JFrame {
                 }
             }
         });
-		textFieldProntuario.setText("");
-		textFieldProntuario.setColumns(10);
+		textFieldProntuario_1.setText("");
+		textFieldProntuario_1.setColumns(10);
 		//------------------------------------------------------------------------------------------------------------------
 		JLabel lblSenha = new JLabel("Senha:");
 
@@ -167,6 +222,7 @@ public class ServidorGUI extends JFrame {
                     } else {
                         digitacaoSenhaValida();
                     }
+                	rdbtnVoluntario.requestFocus();
                 }
         	}
         });
@@ -217,6 +273,11 @@ public class ServidorGUI extends JFrame {
 		//------------------------------------------------------------------------------------------------------------------
 		btnExcluir = new JButton("Excluir");
 		btnExcluir.setIcon(new ImageIcon(ServidorGUI.class.getResource("/com/scanner_patrimonio/struct/imagens/iconFechar.png")));
+		btnExcluir.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				excluirServidor();
+			}
+		});
 		//------------------------------------------------------------------------------------------------------------------
 		btnSair = new JButton("Sair");
 		btnSair.setIcon(new ImageIcon(ServidorGUI.class.getResource("/com/scanner_patrimonio/struct/imagens/sair.png")));
@@ -230,11 +291,12 @@ public class ServidorGUI extends JFrame {
 		JLabel lblCodigo = new JLabel("ID:");
 		
 		textFieldCodigo = new JTextField();
+		textFieldCodigo.setEditable(false);
 		textFieldCodigo.addKeyListener(new KeyAdapter() {
 			@Override
 			public void keyPressed(KeyEvent e) {
 				if ( e.getKeyCode() == KeyEvent.VK_ENTER) {
-					buscarServidor();
+					//buscarServidor();
 					textFieldNome.requestFocus();
 				}
 			}
@@ -242,7 +304,7 @@ public class ServidorGUI extends JFrame {
 		textFieldCodigo.addFocusListener(new FocusAdapter() {
 			@Override
 			public void focusLost(FocusEvent e) {
-				buscarServidor();
+				//buscarServidor();
 			}
 
 			
@@ -250,48 +312,56 @@ public class ServidorGUI extends JFrame {
 		textFieldCodigo.setColumns(10);
 //------------------------------------------------------------------------------------------------------------------
 		checkName = new JLabel("");
-		checkName.setIcon(new ImageIcon(PatrimonioGUI.class.getResource("/com/scanner_patrimonio/struct/imagens/ok.png")));
+		checkName.setIcon(new ImageIcon(ServidorGUI.class.getResource("/com/scanner_patrimonio/struct/imagens/ok.png")));
 		checkName.setHorizontalAlignment(SwingConstants.CENTER);
 		
 		checkProntuario = new JLabel("");
-		checkProntuario.setIcon(new ImageIcon(PatrimonioGUI.class.getResource("/com/scanner_patrimonio/struct/imagens/ok.png")));
+		checkProntuario.setIcon(new ImageIcon(ServidorGUI.class.getResource("/com/scanner_patrimonio/struct/imagens/ok.png")));
 		checkProntuario.setHorizontalAlignment(SwingConstants.CENTER);
 		
 		checkSenha = new JLabel("");
-		checkSenha.setIcon(new ImageIcon(PatrimonioGUI.class.getResource("/com/scanner_patrimonio/struct/imagens/ok.png")));
+		checkSenha.setIcon(new ImageIcon(ServidorGUI.class.getResource("/com/scanner_patrimonio/struct/imagens/ok.png")));
 		checkSenha.setHorizontalAlignment(SwingConstants.CENTER);
+		
+		panel = new JPanel();
 //------------------------------------------------------------------------------------------------------------------
 
 		GroupLayout gl_contentPane = new GroupLayout(contentPane);
 		gl_contentPane.setHorizontalGroup(
 			gl_contentPane.createParallelGroup(Alignment.LEADING)
 				.addGroup(gl_contentPane.createSequentialGroup()
-					.addGap(15)
-					.addGroup(gl_contentPane.createParallelGroup(Alignment.TRAILING)
-						.addComponent(lblCodigo)
-						.addComponent(lblSenha)
-						.addComponent(lblProntuario)
-						.addComponent(lblNome))
-					.addPreferredGap(ComponentPlacement.RELATED)
 					.addGroup(gl_contentPane.createParallelGroup(Alignment.LEADING)
 						.addGroup(gl_contentPane.createSequentialGroup()
-							.addComponent(btnIncluir)
-							.addGap(18)
-							.addComponent(btnAlterar)
-							.addGap(18)
-							.addComponent(btnExcluir)
-							.addGap(18)
-							.addComponent(btnSair))
-						.addComponent(textFieldNome, GroupLayout.PREFERRED_SIZE, 465, GroupLayout.PREFERRED_SIZE)
-						.addGroup(gl_contentPane.createParallelGroup(Alignment.TRAILING, false)
-							.addComponent(passwordFieldSenha, Alignment.LEADING)
-							.addComponent(textFieldProntuario, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 136, Short.MAX_VALUE))
-						.addGroup(gl_contentPane.createSequentialGroup()
-							.addComponent(rdbtnVoluntario)
-							.addGap(18)
-							.addComponent(rdbtnAdmin))
-						.addComponent(textFieldCodigo, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-					.addContainerGap(30, Short.MAX_VALUE))
+							.addGap(15)
+							.addGroup(gl_contentPane.createParallelGroup(Alignment.TRAILING)
+								.addComponent(lblCodigo)
+								.addComponent(lblProntuario)
+								.addComponent(lblNome)
+								.addGroup(gl_contentPane.createParallelGroup(Alignment.LEADING)
+									.addComponent(btnIncluir)
+									.addComponent(lblSenha)))
+							.addPreferredGap(ComponentPlacement.RELATED)
+							.addGroup(gl_contentPane.createParallelGroup(Alignment.LEADING)
+								.addComponent(textFieldNome, GroupLayout.PREFERRED_SIZE, 465, GroupLayout.PREFERRED_SIZE)
+								.addGroup(gl_contentPane.createParallelGroup(Alignment.TRAILING, false)
+									.addComponent(passwordFieldSenha, Alignment.LEADING)
+									.addComponent(textFieldProntuario_1, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 136, Short.MAX_VALUE))
+								.addComponent(textFieldCodigo, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+								.addGroup(gl_contentPane.createParallelGroup(Alignment.LEADING)
+									.addGroup(gl_contentPane.createSequentialGroup()
+										.addComponent(btnAlterar)
+										.addPreferredGap(ComponentPlacement.UNRELATED)
+										.addComponent(btnExcluir)
+										.addPreferredGap(ComponentPlacement.UNRELATED)
+										.addComponent(btnSair))
+									.addGroup(gl_contentPane.createSequentialGroup()
+										.addComponent(rdbtnVoluntario)
+										.addGap(18)
+										.addComponent(rdbtnAdmin)))))
+						.addGroup(Alignment.TRAILING, gl_contentPane.createSequentialGroup()
+							.addGap(463)
+							.addComponent(panel, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+					.addContainerGap())
 		);
 		gl_contentPane.setVerticalGroup(
 			gl_contentPane.createParallelGroup(Alignment.LEADING)
@@ -304,10 +374,10 @@ public class ServidorGUI extends JFrame {
 					.addGroup(gl_contentPane.createParallelGroup(Alignment.BASELINE)
 						.addComponent(lblNome)
 						.addComponent(textFieldNome, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-					.addGap(18)
+					.addPreferredGap(ComponentPlacement.RELATED, 18, Short.MAX_VALUE)
 					.addGroup(gl_contentPane.createParallelGroup(Alignment.BASELINE)
 						.addComponent(lblProntuario)
-						.addComponent(textFieldProntuario, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+						.addComponent(textFieldProntuario_1, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
 					.addGap(18)
 					.addGroup(gl_contentPane.createParallelGroup(Alignment.BASELINE)
 						.addComponent(lblSenha)
@@ -322,24 +392,50 @@ public class ServidorGUI extends JFrame {
 						.addComponent(btnAlterar)
 						.addComponent(btnExcluir)
 						.addComponent(btnSair))
+					.addGap(12)
+					.addComponent(panel, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
 					.addContainerGap())
 		);
+		
+		btnRelatrio = new JButton("Relatório");
+		btnRelatrio.setIcon(new ImageIcon(ServidorGUI.class.getResource("/com/scanner_patrimonio/struct/imagens/pdf.png")));
+		btnRelatrio.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				imprimeRelatorio();
+			}
+		});
+		panel.add(btnRelatrio);
 		contentPane.setLayout(gl_contentPane);
-		limpaTextoCampo();
-		desabilitaCheckCampo();
+		
+		/*
+		 * btnAlterar.setEnabled(false); btnIncluir.setEnabled(false);
+		 * btnExcluir.setEnabled(false);
+		 */
 	}
 	
 	
 	//------------------------------------------------------------------------------------------------------------------
 	protected void excluirServidor() {
 		
+		Integer toReturn = 0;
+		
 		Servidor servidor = pegarDadosServidor();
 		
 		ServidorService servidorService = new ServidorService();
 		
-		servidorService.delete(servidor);
+		toReturn = servidorService.delete(servidor);
 		
-		limpaTextoCampo();
+		if ( toReturn == VariaveisProjeto.ERRO_EXCLUSAO ) {
+			showMensagem("Erro na Exclusão do Registro, verifique com seu administrador!",
+					   	 "Erro",JOptionPane.ERROR_MESSAGE);
+		}
+		if ( toReturn == VariaveisProjeto.EXCLUSAO_REALIZADA) {
+			showMensagem("Exclusão do Registro realizada com sucesso!",
+					     "OK",JOptionPane.OK_OPTION);
+			limpaTextoCampo();
+			tabelaServidorModel.fireTableDataChanged();
+			servidor = new Servidor();
+		}
 		
 	}
 
@@ -358,22 +454,37 @@ public class ServidorGUI extends JFrame {
 	private void fecharServidor() {
 		dispose();
 	}
+	
+	//------------------------------------------------------------------------------------------------------------------
+	protected void imprimeRelatorio() {
+	
+		RelServidor relServidor = new RelServidor(new JFrame(), true);
+		relServidor.setLocationRelativeTo(null);
+		setVisible(false);
+		relServidor.setVisible(true);
+		
+	}
 	//------------------------------------------------------------------------------------------------------------------
 	private void buscarServidor() {
+		
 		Servidor servidor = new Servidor();
 		
-		if (VariaveisProjeto.digitacaoCampo(textFieldCodigo.getText())){
-			textFieldCodigo.requestFocus();
-			return;
-		}
+		/*
+		 * if (VariaveisProjeto.digitacaoCampo(textFieldCodigo.getText())){
+		 * textFieldCodigo.requestFocus(); return; }
+		 * 
+		 * Integer id = Integer.valueOf(textFieldCodigo.getText());
+		 */
+		servidor = tabelaServidorModel.getServidor(this.linha);
 		
-		Integer id = Integer.valueOf(textFieldCodigo.getText());
+		System.out.println(servidor.toString());
 		
-		ServidorService servidorService = new ServidorService();
-		servidor = servidorService.findById(id);
+		//ServidorService servidorService = new ServidorService();
+		//servidor = servidorService.findById(servidor.getId();
 		
+		textFieldCodigo.setText(String.valueOf(servidor.getId()));
 		textFieldNome.setText(servidor.getName());
-		textFieldProntuario.setText(servidor.getProntuario());
+		textFieldProntuario_1.setText(servidor.getProntuario());
 		passwordFieldSenha.setText(servidor.getPassword());
 		
 		if (servidor.isAdmin())
@@ -382,19 +493,21 @@ public class ServidorGUI extends JFrame {
 		if (servidor.isVoluntario())
 			rdbtnVoluntario.setSelected(true);
 	}
+	
 	//------------------------------------------------------------------------------------------------------------------
 	@SuppressWarnings("deprecation") 
 	public Servidor pegarDadosServidor() {
+		
 		 Servidor servidor = new Servidor();
 		 
-		 if (VariaveisProjeto.digitacaoCampo(textFieldCodigo.getText())){
-				textFieldCodigo.requestFocus();
-			}
+	 
+		 if (VariaveisProjeto.digitacaoCampo(textFieldCodigo.getText()) == false){
+			 servidor.setId(Integer.valueOf(textFieldCodigo.getText()));
+		 }
 		 
-		 servidor.setId(Integer.valueOf(textFieldCodigo.getText()));
 		 servidor.setName(textFieldNome.getText());
-		 servidor.setProntuario(textFieldProntuario.getText());
-		 servidor.setPassword(passwordFieldSenha.getSelectedText());
+		 servidor.setProntuario(textFieldProntuario_1.getText());
+		 servidor.setPassword(passwordFieldSenha.getText());
 		 
 		 if (rdbtnVoluntario.isSelected()) {
 			 servidor.setVoluntario(true);
@@ -407,20 +520,21 @@ public class ServidorGUI extends JFrame {
 		 } else {
 			 servidor.setAdmin(false);
 		 }
-		 //rdbtnVoluntario.isSelected() ? servidor.setVoluntario(true): servidor.setVoluntario(false);
+		 
+		 
 		 return servidor;
 	 }
 	//------------------------------------------------------------------------------------------------------------------
 		private void limpaTextoCampo() {
 			textFieldCodigo.setText(VariaveisProjeto.LIMPA_CAMPO);
 			textFieldNome.setText(VariaveisProjeto.LIMPA_CAMPO);
-			textFieldProntuario.setText(VariaveisProjeto.LIMPA_CAMPO);
+			textFieldProntuario_1.setText(VariaveisProjeto.LIMPA_CAMPO);
 			passwordFieldSenha.setText(VariaveisProjeto.LIMPA_CAMPO);
 			rdbtnAdmin.setSelected(false);
 			rdbtnVoluntario.setSelected(false);
 		}
 	//------------------------------------------------------------------------------------------------------------------
-		private void desabilitaCheckCampo() {
+		private void desabilitaCheckCampos() {
 		    checkName.setVisible(false);
 		    checkProntuario.setVisible(false);
 		    checkSenha.setVisible(false);
@@ -454,9 +568,9 @@ public class ServidorGUI extends JFrame {
 	        checkName.setVisible(true);
 
 	        if(status == false) {
-	            checkName.setIcon(new ImageIcon(PatrimonioGUI.class.getResource("/com/scanner_patrimonio/struct/imagens/iconFechar.png")));
+	            checkName.setIcon(new ImageIcon(ServidorGUI.class.getResource("/com/scanner_patrimonio/struct/imagens/iconFechar.png")));
 	        } else {
-	            checkName.setIcon(new ImageIcon(PatrimonioGUI.class.getResource("/com/scanner_patrimonio/struct/imagens/ok.png")));
+	            checkName.setIcon(new ImageIcon(ServidorGUI.class.getResource("/com/scanner_patrimonio/struct/imagens/ok.png")));
 	        }
 	    }	
   //-------------------------------------------------------------------------------------------------------//
@@ -466,7 +580,7 @@ public class ServidorGUI extends JFrame {
   	        status = true;
   	        mudaStatusCheckProntuario();
   	        checkProntuario.setVisible(true);
-  	        textFieldProntuario.requestFocus();
+  	        textFieldProntuario_1.requestFocus();
   	    }
 
   //-------------------------------------------------------------------------------------------------------//
@@ -488,9 +602,9 @@ public class ServidorGUI extends JFrame {
         checkProntuario.setVisible(true);
 
         if(status == false) {
-            checkProntuario.setIcon(new ImageIcon(PatrimonioGUI.class.getResource("/com/scanner_patrimonio/struct/imagens/iconFechar.png")));
+            checkProntuario.setIcon(new ImageIcon(ServidorGUI.class.getResource("/com/scanner_patrimonio/struct/imagens/iconFechar.png")));
         } else {
-            checkProntuario.setIcon(new ImageIcon(PatrimonioGUI.class.getResource("/com/scanner_patrimonio/struct/imagens/ok.png")));
+            checkProntuario.setIcon(new ImageIcon(ServidorGUI.class.getResource("/com/scanner_patrimonio/struct/imagens/ok.png")));
         }
   	    }		    
   	 	//-------------------------------------------------------------------------------------------------------//
@@ -506,7 +620,7 @@ public class ServidorGUI extends JFrame {
   	    @SuppressWarnings("deprecation")
   	    private boolean verificaDigitacaoSenha() {
 
-  	        if(VariaveisProjeto.digitacaoCampo(passwordFieldSenha.getSelectedText())) {
+  	        if(VariaveisProjeto.digitacaoCampo(passwordFieldSenha.getText())) {
   	            status = false;
   	            mudaStatusCheckSenha();
   	            return true;
@@ -521,9 +635,9 @@ public class ServidorGUI extends JFrame {
         checkSenha.setVisible(true);
 
         if(status == false) {
-            checkSenha.setIcon(new ImageIcon(PatrimonioGUI.class.getResource("/com/scanner_patrimonio/struct/imagens/iconFechar.png")));
+            checkSenha.setIcon(new ImageIcon(ServidorGUI.class.getResource("/com/scanner_patrimonio/struct/imagens/iconFechar.png")));
         } else {
-            checkSenha.setIcon(new ImageIcon(PatrimonioGUI.class.getResource("/com/scanner_patrimonio/struct/imagens/ok.png")));
+            checkSenha.setIcon(new ImageIcon(ServidorGUI.class.getResource("/com/scanner_patrimonio/struct/imagens/ok.png")));
         }
     }
   	   
@@ -582,7 +696,7 @@ public class ServidorGUI extends JFrame {
 
   	//------------------------------------------------------------------------------------------------------/
 	private void erroDigitacao(Integer toReturn) {
-		if ( toReturn == VariaveisProjeto.SERVIDOR_USER_NAME ) {
+		if ( toReturn == VariaveisProjeto.SERVIDOR_NAME ) {
 			 status = false;
 			 mudaStatusCheckNome();
 			 showMensagem("Erro na digitação do Nome, verifique!","Erro", JOptionPane.ERROR_MESSAGE);
@@ -628,6 +742,7 @@ public class ServidorGUI extends JFrame {
 	private void showMensagem(String mensagem, String status, int option ) {
 		JOptionPane.showMessageDialog(null, mensagem, status, option );
 	}
+
 		
 		
 		

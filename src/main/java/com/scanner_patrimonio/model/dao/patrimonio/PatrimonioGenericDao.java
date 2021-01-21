@@ -7,7 +7,7 @@ import java.util.List;
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
 
-public abstract class PatrimonioGenericDao <Patrimonio, Id extends Serializable>{
+public class PatrimonioGenericDao extends GenericDao <Patrimonio, Id extends Serializable>{
 	
 	private EntityManager entityManager;	
 	
@@ -55,10 +55,6 @@ public abstract class PatrimonioGenericDao <Patrimonio, Id extends Serializable>
 	
 	public EntityManager getEntityManager() {
 		return entityManager;
-	}
-	
-	public void setEntityManager(EntityManager entityManager) {
-		this.entityManager = entityManager;
 	}
 	
 	public Class<Patrimonio> getClassePersistencia() {
