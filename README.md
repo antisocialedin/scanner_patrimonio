@@ -1,2 +1,2 @@
 # scanner_patrimonio
-# Projeto de Programação Orientada a Eventos
+# Projeto de programação orientada a eventos em Java
